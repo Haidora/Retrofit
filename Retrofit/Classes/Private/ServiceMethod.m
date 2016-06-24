@@ -18,7 +18,7 @@
 @interface ServiceMethod ()
 
 @property (nonatomic, strong) Retrofit *retrofit;
-@property (nonatomic, assign) id<ServicePresentable> service;
+@property (nonatomic, strong) id<ServicePresentable> service;
 // http info
 @property (nonatomic, strong) NSURL *httpURL;
 @property (nonatomic, copy) NSString *httpMethod;
