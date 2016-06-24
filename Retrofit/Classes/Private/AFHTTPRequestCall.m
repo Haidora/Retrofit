@@ -44,14 +44,7 @@
 #pragma mark
 #pragma mark Utils
 
-- (AFHTTPRequestOperation *)createHTTPRequestOperation
-{
-    NSURLRequest *request = [self.serviceMethod toRequest];
-    AFHTTPRequestOperation *operation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
-    return operation;
-}
-
-- (void)buildExecute
+- (void)preForExecute
 {
     //判断是否已经运行
     if (self.executed)
@@ -60,8 +53,6 @@
     }
     self.executed = YES;
     self.canceled = NO;
-
-    self.requestOperation = [self createHTTPRequestOperation];
 }
 
 - (void)dealWithResponse:(NSHTTPURLResponse *)response data:(NSData *)responseData
@@ -99,45 +90,63 @@
 
 - (id)execute
 {
-    [self buildExecute];
+    [self preForExecute];
 
-    [self.requestOperation start];
-    [self.requestOperation waitUntilFinished];
-
+    id responseObject = nil;
+    // build Request
+    NSError *error;
+    NSURLRequest *request = [self.serviceMethod toRequest:&error];
+    if (!error)
+    {
+        // create operation
+        self.requestOperation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
+        [self.requestOperation start];
+        [self.requestOperation waitUntilFinished];
+        // check error
+        if (self.requestOperation.error)
+        {
+            error = self.requestOperation.error;
+        }
+        else
+        {
+            responseObject = [self.serviceMethod toResponse:self.requestOperation.response
+                                                       data:self.requestOperation.responseData
+                                                      error:&error];
+        }
+    }
     self.executed = NO;
     self.canceled = NO;
-
-    NSError *error = nil;
-    id responseObject = nil;
-    if (self.requestOperation.error)
-    {
-        error = self.requestOperation.error;
-    }
-    else
-    {
-        responseObject = [self.serviceMethod toResponse:self.requestOperation.response
-                                                   data:self.requestOperation.responseData
-                                                  error:&error];
-    }
     return error ?: responseObject;
 }
 
 - (void)enqueue:(__weak id<Callback>)callBack
 {
-    [self buildExecute];
-
+    [self preForExecute];
     self.callBack = callBack;
-    __strong __typeof(self) strongSelf = self;
-    [self.requestOperation
-        setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *_Nonnull operation,
-                                        id _Nonnull responseObject) {
-          [strongSelf dealWithResponse:operation.response data:operation.responseData];
-        }
-        failure:^(AFHTTPRequestOperation *_Nonnull operation, NSError *_Nonnull error) {
-          [strongSelf dealWithResponse:operation.response error:error];
-        }];
-    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
-    [manager.operationQueue addOperation:self.requestOperation];
+
+    // build Request
+    NSError *error;
+    NSURLRequest *request = [self.serviceMethod toRequest:&error];
+    if (!error)
+    {
+        __strong __typeof(self) strongSelf = self;
+        // create operation
+        self.requestOperation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
+        [self.requestOperation
+            setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *_Nonnull operation,
+                                            id _Nonnull responseObject) {
+              [strongSelf dealWithResponse:operation.response data:operation.responseData];
+            }
+            failure:^(AFHTTPRequestOperation *_Nonnull operation, NSError *_Nonnull error) {
+              [strongSelf dealWithResponse:operation.response error:error];
+            }];
+        AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
+        [manager.operationQueue addOperation:self.requestOperation];
+    }
+    else
+    {
+        [self dealWithResponse:nil error:error];
+    }
 }
 
 - (BOOL)isExecuted
@@ -150,6 +159,10 @@
     [self.requestOperation cancel];
     self.canceled = YES;
     self.executed = NO;
+    if ([self.callBack respondsToSelector:@selector(onCanceled:)])
+    {
+        [self.callBack onCanceled:self];
+    }
 }
 
 - (BOOL)isCanceled

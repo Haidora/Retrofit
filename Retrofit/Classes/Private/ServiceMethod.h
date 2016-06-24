@@ -18,7 +18,7 @@
 
 - (instancetype)initWith:(id<ServicePresentable>)service retrofit:(Retrofit *)retrofit;
 
-- (NSURLRequest *)toRequest;
+- (NSURLRequest *)toRequest:(NSError **)error;
 - (id)toResponse:(NSHTTPURLResponse *)response data:(NSData *)responseData error:(NSError **)error;
 
 @end

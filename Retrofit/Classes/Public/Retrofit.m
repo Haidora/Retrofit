@@ -35,19 +35,6 @@
     NSLog(@"%@-dealloc", NSStringFromClass([self class]));
 }
 
-#pragma mark
-#pragma mark Setter/Getter
-
-- (void)setBaseURL:(NSURL *)baseURL
-{
-    _baseURL = baseURL;
-}
-
-- (void)setTimeoutInterval:(NSTimeInterval)timeoutInterval
-{
-    _timeoutInterval = timeoutInterval;
-}
-
 @end
 
 @interface RetrofitBuilder ()
@@ -102,8 +89,8 @@
 {
     return ^() {
       Retrofit *retrofit = [Retrofit new];
-      [retrofit setBaseURL:self.pBaseURL];
-      [retrofit setTimeoutInterval:self.pTimeoutInterval];
+      retrofit.baseURL = self.pBaseURL;
+      retrofit.timeoutInterval = self.pTimeoutInterval;
       retrofit.validators = self.pValidators;
       retrofit.interceptors = self.pInterceptors;
       return retrofit;

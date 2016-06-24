@@ -11,13 +11,13 @@
 @protocol ServicePresentable;
 
 /**
- *  用于请求拦截
+ *  用于拦截请求事件
  */
 @protocol CallInterceptor <NSObject>
 
-@optional
-
 - (void)willSendRequest:(NSURLRequest *)request service:(id<ServicePresentable>)service;
-- (void)didReceiveResponse:(NSHTTPURLResponse *)response service:(id<ServicePresentable>)service;
+- (void)didReceiveResponse:(NSHTTPURLResponse *)response
+                      data:(NSData *)responseData
+                   service:(id<ServicePresentable>)service;
 
 @end

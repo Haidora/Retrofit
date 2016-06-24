@@ -20,16 +20,6 @@
  */
 @interface Retrofit : NSObject
 
-/**
- *  服务器根地址
- */
-@property (nonatomic, strong, readonly) NSURL *baseURL;
-
-/**
- *  请求超时时间,默认60s
- */
-@property (nonatomic, assign, readonly) NSTimeInterval timeoutInterval;
-
 #pragma mark
 #pragma mark build call
 @property (nonatomic, copy, readonly) Call * (^create)(id<ServicePresentable> service);

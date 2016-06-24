@@ -50,7 +50,7 @@
     NSLog(@"%@-dealloc", NSStringFromClass([self class]));
 }
 
-- (NSURLRequest *)toRequest
+- (NSURLRequest *)toRequest:(NSError **)error
 {
     [self praseInfo];
 
@@ -58,23 +58,15 @@
     NSString *httpURLString = self.httpURL.absoluteString;
     id parameters = self.parameters;
 
-    NSError *error;
-    NSMutableURLRequest *request = nil;
-    //    if ([self.httpMethod isEqualToString:@"GET"] || [self.httpMethod isEqualToString:@"HEAD"])
-    //    {
-    request = [self.requestSerializer requestWithMethod:httpMethod
-                                              URLString:httpURLString
-                                             parameters:parameters
-                                                  error:&error];
-    //    }
-    //    else
-    //    {
-    //        request = [self.requestSerializer multipartFormRequestWithMethod:httpMethod
-    //                                                               URLString:httpURLString
-    //                                                              parameters:parameters
-    //                                               constructingBodyWithBlock:nil
-    //                                                                   error:&error];
-    //    }
+    // Serializer
+    NSMutableURLRequest *request = [self.requestSerializer requestWithMethod:httpMethod
+                                                                   URLString:httpURLString
+                                                                  parameters:parameters
+                                                                       error:error];
+    if (*error)
+    {
+        return nil;
+    }
     // Interceptor
     for (id<CallInterceptor> interceptor in self.retrofit.interceptors)
     {
@@ -87,7 +79,7 @@
 { // Interceptor
     for (id<CallInterceptor> interceptor in self.retrofit.interceptors)
     {
-        [interceptor didReceiveResponse:response service:self.service];
+        [interceptor didReceiveResponse:response data:responseData service:self.service];
     }
     // Serializer
     id responseObject =
