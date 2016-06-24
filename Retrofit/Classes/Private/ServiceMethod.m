@@ -45,6 +45,11 @@
     return self;
 }
 
+- (void)dealloc
+{
+    NSLog(@"%@-dealloc", NSStringFromClass([self class]));
+}
+
 - (NSURLRequest *)toRequest
 {
     [self praseInfo];
@@ -87,7 +92,7 @@
     // Serializer
     id responseObject =
         [self.responseSerializer responseObjectForResponse:response data:responseData error:error];
-    if (error)
+    if (*error)
     {
         return nil;
     }

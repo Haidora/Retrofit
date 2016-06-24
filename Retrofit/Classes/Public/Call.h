@@ -41,8 +41,40 @@
 
 @interface Call (BlockSupport)
 
+/**
+ *  @param response 成功回调
+ *  @param failure  失败回调
+ */
+- (void)enqueueWith:(void (^)(Call *call, id response))response
+            failure:(void (^)(Call *call, NSError *error))failure;
+
+/**
+ *  @param response 成功回调
+ *  @param failure  失败回调
+ *  @param cancel   取消回调
+ */
 - (void)enqueueWith:(void (^)(Call *call, id response))response
             failure:(void (^)(Call *call, NSError *error))failure
              cancel:(void (^)(Call *call))cancel;
+
+/**
+ *  @param response 成功回调－>finish
+ *  @param failure  失败回调->finish
+ *  @param finish   完成回调
+ */
+- (void)enqueueWith:(void (^)(Call *call, id response))response
+            failure:(void (^)(Call *call, NSError *error))failure
+             finish:(void (^)(Call *call))finish;
+
+/**
+ *  @param response 成功回调－>finish
+ *  @param failure  失败回调->finish
+ *  @param cancel   取消回调
+ *  @param finish   完成回调
+ */
+- (void)enqueueWith:(void (^)(Call *call, id response))response
+            failure:(void (^)(Call *call, NSError *error))failure
+             cancel:(void (^)(Call *call))cancel
+             finish:(void (^)(Call *call))finish;
 
 @end

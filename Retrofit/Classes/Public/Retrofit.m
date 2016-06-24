@@ -30,6 +30,11 @@
     return call;
 }
 
+- (void)dealloc
+{
+    NSLog(@"%@-dealloc", NSStringFromClass([self class]));
+}
+
 #pragma mark
 #pragma mark Setter/Getter
 
@@ -55,6 +60,11 @@
 @end
 
 @implementation RetrofitBuilder
+
+- (void)dealloc
+{
+    NSLog(@"%@-dealloc", NSStringFromClass([self class]));
+}
 
 - (RetrofitBuilder * (^)(NSString *))baseURL
 {
