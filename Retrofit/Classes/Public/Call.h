@@ -24,7 +24,7 @@
 /**
  *  抽象类
  */
-@interface Call : NSObject <NSCopying>
+@interface Call <__covariant ObjectType> : NSObject <NSCopying>
 
 //同步请求
 - (id)execute;
@@ -39,13 +39,13 @@
 
 @end
 
-@interface Call (BlockSupport)
+@interface Call <__covariant ObjectType> (BlockSupport)
 
 /**
  *  @param response 成功回调
  *  @param failure  失败回调
  */
-- (void)enqueueWith:(void (^)(Call *call, id response))response
+- (void)enqueueWith:(void (^)(Call *call, ObjectType response))response
             failure:(void (^)(Call *call, NSError *error))failure;
 
 /**
@@ -53,7 +53,7 @@
  *  @param failure  失败回调
  *  @param cancel   取消回调
  */
-- (void)enqueueWith:(void (^)(Call *call, id response))response
+- (void)enqueueWith:(void (^)(Call *call, ObjectType response))response
             failure:(void (^)(Call *call, NSError *error))failure
              cancel:(void (^)(Call *call))cancel;
 
@@ -62,7 +62,7 @@
  *  @param failure  失败回调->finish
  *  @param finish   完成回调
  */
-- (void)enqueueWith:(void (^)(Call *call, id response))response
+- (void)enqueueWith:(void (^)(Call *call, ObjectType response))response
             failure:(void (^)(Call *call, NSError *error))failure
              finish:(void (^)(Call *call))finish;
 
@@ -72,7 +72,7 @@
  *  @param cancel   取消回调
  *  @param finish   完成回调
  */
-- (void)enqueueWith:(void (^)(Call *call, id response))response
+- (void)enqueueWith:(void (^)(Call *call, ObjectType response))response
             failure:(void (^)(Call *call, NSError *error))failure
              cancel:(void (^)(Call *call))cancel
              finish:(void (^)(Call *call))finish;
