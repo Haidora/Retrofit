@@ -27,6 +27,7 @@
 @property (nonatomic, strong) id parameters;
 // Serializer
 @property (nonatomic, strong) AFHTTPRequestSerializer<AFURLRequestSerialization> *requestSerializer;
+@property (nonatomic, copy) void (^multipartForm)(id<AFMultipartFormData>);
 @property (nonatomic, strong)
     AFHTTPResponseSerializer<AFURLResponseSerialization> *responseSerializer;
 
@@ -59,10 +60,23 @@
     id parameters = self.parameters;
 
     // Serializer
-    NSMutableURLRequest *request = [self.requestSerializer requestWithMethod:httpMethod
-                                                                   URLString:httpURLString
-                                                                  parameters:parameters
-                                                                       error:error];
+    NSMutableURLRequest *request;
+    if ([httpURLString isEqualToString:@"GET"] || [httpURLString isEqualToString:@"HEAD"])
+    {
+
+        request = [self.requestSerializer requestWithMethod:httpMethod
+                                                  URLString:httpURLString
+                                                 parameters:parameters
+                                                      error:error];
+    }
+    else
+    {
+        request = [self.requestSerializer multipartFormRequestWithMethod:httpMethod
+                                                               URLString:httpURLString
+                                                              parameters:parameters
+                                               constructingBodyWithBlock:self.multipartForm
+                                                                   error:error];
+    }
     if (*error)
     {
         return nil;
@@ -112,6 +126,7 @@
     self.timeoutInterval = [self praseTimeoutInterval];
     self.requestSerializer = [self praseRequestSerializer];
     self.responseSerializer = [self praseResponseSerializer];
+    self.multipartForm = [self praseMultipartForm];
 }
 
 - (NSURL *)praseURL
@@ -189,6 +204,16 @@
         responseSerializer = [self.service responseSerializer];
     }
     return responseSerializer ?: [AFHTTPResponseSerializer serializer];
+}
+
+- (void (^)(id<AFMultipartFormData>))praseMultipartForm
+{
+    void (^multipartForm)(id<AFMultipartFormData>) = nil;
+    if ([self.service respondsToSelector:@selector(multipartForm)])
+    {
+        multipartForm = [self.service multipartForm];
+    }
+    return multipartForm;
 }
 
 @end

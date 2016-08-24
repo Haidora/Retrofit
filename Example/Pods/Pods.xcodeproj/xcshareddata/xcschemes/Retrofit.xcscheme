@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = '5E7777A0F7A4A90A76331B10'
+               BlueprintIdentifier = '1B686FB51CE9DD1F459F3546'
                BlueprintName = 'Retrofit'
                ReferencedContainer = 'container:Pods.xcodeproj'
                BuildableName = 'libRetrofit.a'>

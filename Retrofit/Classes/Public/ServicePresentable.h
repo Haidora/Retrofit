@@ -12,6 +12,7 @@
 @protocol AFURLRequestSerialization;
 @class AFHTTPResponseSerializer;
 @protocol AFURLResponseSerialization;
+@protocol AFMultipartFormData;
 
 /**
  *  服务配置信息
@@ -45,6 +46,7 @@
 #pragma mark AFNetworking-Serialization
 @property (nonatomic, strong, readonly)
     AFHTTPRequestSerializer<AFURLRequestSerialization> *requestSerializer;
+@property (nonatomic, copy, readonly) void (^multipartForm)(id<AFMultipartFormData>);
 @property (nonatomic, strong, readonly)
     AFHTTPResponseSerializer<AFURLResponseSerialization> *responseSerializer;
 
