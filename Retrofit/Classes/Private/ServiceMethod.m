@@ -61,21 +61,20 @@
 
     // Serializer
     NSMutableURLRequest *request;
-    if ([httpURLString isEqualToString:@"GET"] || [httpURLString isEqualToString:@"HEAD"])
-    {
-
-        request = [self.requestSerializer requestWithMethod:httpMethod
-                                                  URLString:httpURLString
-                                                 parameters:parameters
-                                                      error:error];
-    }
-    else
+    if (self.multipartForm)
     {
         request = [self.requestSerializer multipartFormRequestWithMethod:httpMethod
                                                                URLString:httpURLString
                                                               parameters:parameters
                                                constructingBodyWithBlock:self.multipartForm
                                                                    error:error];
+    }
+    else
+    {
+        request = [self.requestSerializer requestWithMethod:httpMethod
+                                                  URLString:httpURLString
+                                                 parameters:parameters
+                                                      error:error];
     }
     if (*error)
     {
