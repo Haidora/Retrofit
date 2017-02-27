@@ -19,6 +19,11 @@
  */
 @protocol ServicePresentable <NSObject>
 
+/**
+ *  请求超时时间(设置后会覆盖全局)
+ */
+@property (nonatomic, assign, readwrite) NSTimeInterval timeoutInterval;
+    
 @optional
 
 /**
@@ -33,10 +38,6 @@
  *  相对地址
  */
 @property (nonatomic, copy, readonly) NSString *relativePath;
-/**
- *  请求超时时间
- */
-@property (nonatomic, assign, readonly) NSTimeInterval timeoutInterval;
 /**
  *  请求参数
  */

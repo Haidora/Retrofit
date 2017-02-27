@@ -80,6 +80,11 @@
     {
         return nil;
     }
+    //timeout
+    if (self.timeoutInterval > 0)
+    {
+        request.timeoutInterval = self.timeoutInterval;
+    }
     // Interceptor
     for (id<CallInterceptor> interceptor in self.retrofit.interceptors)
     {
@@ -177,10 +182,10 @@
 
 - (NSTimeInterval)praseTimeoutInterval
 {
-    NSTimeInterval timeoutInterval = 60;
+    NSTimeInterval timeoutInterval = 0;
     if ([self.service respondsToSelector:@selector(timeoutInterval)])
     {
-        timeoutInterval = [self.service timeoutInterval];
+        timeoutInterval = [self.service timeoutInterval] ?: self.retrofit.timeoutInterval;
     }
     return timeoutInterval;
 }
