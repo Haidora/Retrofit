@@ -7,6 +7,7 @@
 //
 
 #import "AFHTTPRequestCall.h"
+#import "Call.h"
 #import "ServiceMethod.h"
 #import <AFNetworking/AFNetworking.h>
 
@@ -126,12 +127,17 @@
 
     // build Request
     NSError *error;
-    NSURLRequest *request = [self.serviceMethod toRequest:&error];
+    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
+    NSURLRequest *request = [self.serviceMethod toRequest:manager error:&error];
     if (!error)
     {
         __strong __typeof(self) strongSelf = self;
         // create operation
         self.requestOperation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
+        if (manager.securityPolicy)
+        {
+            self.requestOperation.securityPolicy = manager.securityPolicy;
+        }
         [self.requestOperation
             setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *_Nonnull operation,
                                             id _Nonnull responseObject) {
@@ -140,7 +146,6 @@
             failure:^(AFHTTPRequestOperation *_Nonnull operation, NSError *_Nonnull error) {
               [strongSelf dealWithResponse:operation.response error:error];
             }];
-        AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
         [manager.operationQueue addOperation:self.requestOperation];
     }
     else

@@ -12,6 +12,7 @@
 #import "Retrofit_Internal.h"
 #import "ServiceMethod.h"
 #import "ServicePresentable.h"
+#import <AFNetworking.h>
 #import <AFNetworking/AFURLRequestSerialization.h>
 #import <AFNetworking/AFURLResponseSerialization.h>
 
@@ -25,6 +26,8 @@
 @property (nonatomic, assign) NSTimeInterval timeoutInterval;
 @property (nonatomic, strong) NSDictionary *headers;
 @property (nonatomic, strong) id parameters;
+//manager
+@property (nonatomic, copy) void (^configureOperationManager)(AFHTTPRequestOperationManager *manager);
 // Serializer
 @property (nonatomic, strong) AFHTTPRequestSerializer<AFURLRequestSerialization> *requestSerializer;
 @property (nonatomic, copy) void (^multipartForm)(id<AFMultipartFormData>);
@@ -52,6 +55,11 @@
 }
 
 - (NSURLRequest *)toRequest:(NSError **)error
+{
+    return [self toRequest:nil error:error];
+}
+
+- (NSURLRequest *)toRequest:(AFHTTPRequestOperationManager *)manager error:(NSError **)error
 {
     [self praseInfo];
 
@@ -89,6 +97,11 @@
     for (id<CallInterceptor> interceptor in self.retrofit.interceptors)
     {
         [interceptor willSendRequest:request service:self.service];
+    }
+    //config manager
+    if (self.configureOperationManager && manager)
+    {
+        self.configureOperationManager(manager);
     }
     return request;
 }
@@ -131,6 +144,7 @@
     self.requestSerializer = [self praseRequestSerializer];
     self.responseSerializer = [self praseResponseSerializer];
     self.multipartForm = [self praseMultipartForm];
+    self.configureOperationManager = [self praseOperationManager];
 }
 
 - (NSURL *)praseURL
@@ -218,6 +232,16 @@
         multipartForm = [self.service multipartForm];
     }
     return multipartForm;
+}
+
+- (void (^)(AFHTTPRequestOperationManager *))praseOperationManager
+{
+    void (^configureOperationManager)(AFHTTPRequestOperationManager *manager) = nil;
+    if ([self.service respondsToSelector:@selector(configureOperationManager)])
+    {
+        configureOperationManager = [self.service configureOperationManager];
+    }
+    return configureOperationManager;
 }
 
 @end

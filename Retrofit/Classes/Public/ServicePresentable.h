@@ -13,6 +13,7 @@
 @class AFHTTPResponseSerializer;
 @protocol AFURLResponseSerialization;
 @protocol AFMultipartFormData;
+@class AFHTTPRequestOperationManager;
 
 /**
  *  服务配置信息
@@ -43,6 +44,9 @@
  */
 @property (nonatomic, strong, readonly) id parameters;
 
+#pragma mark
+#pragma mark AFNetworking
+@property (nonatomic, copy, readonly) void (^configureOperationManager)(AFHTTPRequestOperationManager *manager);
 #pragma mark
 #pragma mark AFNetworking-Serialization
 @property (nonatomic, strong, readonly)
