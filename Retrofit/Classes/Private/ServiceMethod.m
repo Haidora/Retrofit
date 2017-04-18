@@ -12,7 +12,7 @@
 #import "Retrofit_Internal.h"
 #import "ServiceMethod.h"
 #import "ServicePresentable.h"
-#import <AFNetworking.h>
+#import <AFNetworking/AFNetworking.h>
 #import <AFNetworking/AFURLRequestSerialization.h>
 #import <AFNetworking/AFURLResponseSerialization.h>
 
