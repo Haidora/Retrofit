@@ -20,4 +20,12 @@
                       data:(NSData *)responseData
                    service:(id<ServicePresentable>)service;
 
+@optional
+- (BOOL)canSendRequest:(NSURLRequest *)request
+               service:(id<ServicePresentable>)service
+                 error:(NSError **)error;
+- (BOOL)canReceiveResponse:(NSHTTPURLResponse *)response
+                      data:(NSData *)responseData
+                   service:(id<ServicePresentable>)service
+                     error:(NSError **)error;
 @end

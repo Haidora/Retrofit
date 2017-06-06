@@ -96,7 +96,21 @@
     // Interceptor
     for (id<CallInterceptor> interceptor in self.retrofit.interceptors)
     {
-        [interceptor willSendRequest:request service:self.service];
+        if ([interceptor respondsToSelector:@selector(canSendRequest:service:error:)])
+        {
+            if ([interceptor canSendRequest:request service:self.service error:error])
+            {
+                [interceptor willSendRequest:request service:self.service];
+            }
+            else
+            {
+                return nil;
+            }
+        }
+        else
+        {
+            [interceptor willSendRequest:request service:self.service];
+        }
     }
     //config manager
     if (self.configureOperationManager && manager)
@@ -110,7 +124,21 @@
 { // Interceptor
     for (id<CallInterceptor> interceptor in self.retrofit.interceptors)
     {
-        [interceptor didReceiveResponse:response data:responseData service:self.service];
+        if ([interceptor respondsToSelector:@selector(canReceiveResponse:data:service:error:)])
+        {
+            if ([interceptor canReceiveResponse:response data:responseData service:self.service error:error])
+            {
+                [interceptor didReceiveResponse:response data:responseData service:self.service];
+            }
+            else
+            {
+                return nil;
+            }
+        }
+        else
+        {
+            [interceptor didReceiveResponse:response data:responseData service:self.service];
+        }
     }
     // Serializer
     id responseObject =
