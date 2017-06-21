@@ -126,7 +126,7 @@
     {
         if ([interceptor respondsToSelector:@selector(canReceiveResponse:data:service:error:)])
         {
-            if ([interceptor canReceiveResponse:response data:responseData service:self.service error:error])
+            if ([interceptor canReceiveResponse:response data:&responseData service:self.service error:error])
             {
                 [interceptor didReceiveResponse:response data:responseData service:self.service];
             }

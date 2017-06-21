@@ -25,7 +25,7 @@
                service:(id<ServicePresentable>)service
                  error:(NSError **)error;
 - (BOOL)canReceiveResponse:(NSHTTPURLResponse *)response
-                      data:(NSData *)responseData
+                      data:(NSData **)responseData
                    service:(id<ServicePresentable>)service
                      error:(NSError **)error;
 @end
