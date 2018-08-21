@@ -40,6 +40,6 @@
 @property (nonatomic, copy, readonly) RetrofitBuilder * (^addInterceptor)
     (id<CallInterceptor> interceptor);
 
-@property (nonatomic, copy, readonly) Retrofit * (^build)();
+@property (nonatomic, copy, readonly) Retrofit * (^build)(void);
 
 @end

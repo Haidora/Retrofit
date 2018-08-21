@@ -3,3 +3,7 @@
 target 'Retrofit_Example' do
   pod 'Retrofit', :path => '../'
 end
+
+target 'Retrofit_Tests' do
+    pod 'Retrofit', :path => '../'
+end

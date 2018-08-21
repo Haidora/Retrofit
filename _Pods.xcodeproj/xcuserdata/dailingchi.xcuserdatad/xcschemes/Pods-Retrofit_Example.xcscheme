@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0700"
+   LastUpgradeVersion = "0930"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -13,11 +13,11 @@
             buildForProfiling = "YES"
             buildForArchiving = "YES">
             <BuildableReference
-               BuildableIdentifier = 'primary'
-               BlueprintIdentifier = '1B686FB51CE9DD1F459F3546'
-               BlueprintName = 'Retrofit'
-               ReferencedContainer = 'container:Pods.xcodeproj'
-               BuildableName = 'libRetrofit.a'>
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "980E0BC1B6B6EDE5CC50619BC7770D58"
+               BlueprintName = "Pods-Retrofit_Example"
+               ReferencedContainer = "container:Pods.xcodeproj"
+               BuildableName = "libPods-Retrofit_Example.a">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>

@@ -46,7 +46,7 @@
 
 #pragma mark
 #pragma mark AFNetworking
-@property (nonatomic, copy, readonly) void (^configureOperationManager)(AFHTTPRequestOperationManager *manager);
+@property (nonatomic, copy, readonly) void (^configureOperationManager)(id manager);
 #pragma mark
 #pragma mark AFNetworking-Serialization
 @property (nonatomic, strong, readonly)

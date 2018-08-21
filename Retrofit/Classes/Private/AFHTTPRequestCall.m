@@ -11,10 +11,18 @@
 #import "ServiceMethod.h"
 #import <AFNetworking/AFNetworking.h>
 
+#if __has_include(<AFNetworking/AFHTTPRequestOperationManager.h>) || __has_include("AFHTTPRequestOperationManager.h")
+#else
+#endif
+
 @interface AFHTTPRequestCall ()
 
 @property (nonatomic, strong) ServiceMethod *serviceMethod;
+#if __has_include(<AFNetworking/AFHTTPRequestOperationManager.h>) || __has_include("AFHTTPRequestOperationManager.h")
 @property (nonatomic, strong) AFHTTPRequestOperation *requestOperation;
+#else
+@property (nonatomic, strong) NSURLSessionDataTask *requestOperation;
+#endif
 
 @property (nonatomic, weak) id<Callback> callBack;
 // call guarded
@@ -35,11 +43,6 @@
         self.executed = NO;
     }
     return self;
-}
-
-- (void)dealloc
-{
-    NSLog(@"%@-dealloc", NSStringFromClass([self class]));
 }
 
 #pragma mark
@@ -95,15 +98,15 @@
 
     id responseObject = nil;
     // build Request
-    NSError *error;
+    __block NSError *error;
     NSURLRequest *request = [self.serviceMethod toRequest:&error];
     if (!error)
     {
-        // create operation
+#if __has_include(<AFNetworking/AFHTTPRequestOperationManager.h>) || __has_include("AFHTTPRequestOperationManager.h")
         self.requestOperation = [[AFHTTPRequestOperation alloc] initWithRequest:request];
         [self.requestOperation start];
         [self.requestOperation waitUntilFinished];
-        // check error
+        //check error
         if (self.requestOperation.error)
         {
             error = self.requestOperation.error;
@@ -114,6 +117,27 @@
                                                        data:self.requestOperation.responseData
                                                       error:&error];
         }
+#else
+        __weak typeof(self) weakSelf = self;
+        dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+        [[[AFHTTPSessionManager manager] dataTaskWithRequest:request
+                                              uploadProgress:nil
+                                            downloadProgress:nil
+                                           completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable responseError) {
+                                               if (responseError)
+                                               {
+                                                   error = responseError;
+                                               }
+                                               else
+                                               {
+                                                   responseObject = [weakSelf.serviceMethod toResponse:(NSHTTPURLResponse *)response
+                                                                                                  data:responseObject
+                                                                                                 error:&error];
+                                               }
+                                               dispatch_semaphore_signal(semaphore);
+                                           }] resume];
+        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+#endif
     }
     self.executed = NO;
     self.canceled = NO;
@@ -126,7 +150,8 @@
     self.callBack = callBack;
 
     // build Request
-    NSError *error;
+    __block NSError *error;
+#if __has_include(<AFNetworking/AFHTTPRequestOperationManager.h>) || __has_include("AFHTTPRequestOperationManager.h")
     AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
     NSURLRequest *request = [self.serviceMethod toRequest:manager error:&error];
     if (!error)
@@ -139,19 +164,44 @@
             self.requestOperation.securityPolicy = manager.securityPolicy;
         }
         [self.requestOperation
-            setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *_Nonnull operation,
-                                            id _Nonnull responseObject) {
-              [strongSelf dealWithResponse:operation.response data:operation.responseData];
-            }
-            failure:^(AFHTTPRequestOperation *_Nonnull operation, NSError *_Nonnull error) {
-              [strongSelf dealWithResponse:operation.response error:error];
-            }];
+         setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *_Nonnull operation,
+                                         id _Nonnull responseObject) {
+             [strongSelf dealWithResponse:operation.response data:operation.responseData];
+         }
+         failure:^(AFHTTPRequestOperation *_Nonnull operation, NSError *_Nonnull error) {
+             [strongSelf dealWithResponse:operation.response error:error];
+         }];
         [manager.operationQueue addOperation:self.requestOperation];
     }
     else
     {
         [self dealWithResponse:nil error:error];
     }
+#else
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+    NSURLRequest *request = [self.serviceMethod toRequest:manager error:&error];
+    if (!error)
+    {
+        __strong typeof(self) weakSelf = self;
+        [[[AFHTTPSessionManager manager] dataTaskWithRequest:request
+                                              uploadProgress:nil
+                                            downloadProgress:nil
+                                           completionHandler:^(NSURLResponse * _Nonnull response, id  _Nullable responseObject, NSError * _Nullable responseError) {
+                                               if (responseError)
+                                               {
+                                                   [weakSelf dealWithResponse:(NSHTTPURLResponse *)response error:error];
+                                               }
+                                               else
+                                               {
+                                                   [weakSelf dealWithResponse:(NSHTTPURLResponse *)response data:responseObject];
+                                               }
+                                           }] resume];
+    }
+    else
+    {
+        [self dealWithResponse:nil error:error];
+    }
+#endif
 }
 
 - (BOOL)isExecuted

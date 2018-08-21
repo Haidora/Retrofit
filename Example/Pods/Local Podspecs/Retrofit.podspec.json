@@ -22,7 +22,7 @@
   ],
   "dependencies": {
     "AFNetworking": [
-      "~> 2.6.3"
+      "~> 3.2.1"
     ]
   }
 }

@@ -20,7 +20,7 @@
 - (instancetype)initWith:(id<ServicePresentable>)service retrofit:(Retrofit *)retrofit;
 
 - (NSURLRequest *)toRequest:(NSError **)error;
-- (NSURLRequest *)toRequest:(AFHTTPRequestOperationManager *)manager error:(NSError **)error;
+- (NSURLRequest *)toRequest:(id)manager error:(NSError **)error;
 - (id)toResponse:(NSHTTPURLResponse *)response data:(NSData *)responseData error:(NSError **)error;
 
 @end
